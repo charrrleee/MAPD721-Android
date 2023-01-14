@@ -2,10 +2,10 @@ package com.zv.geochat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +14,13 @@ import android.widget.EditText;
 
 import com.zv.geochat.service.ChatService;
 
+import java.sql.Timestamp;
+
 public class ChatActivityFragment extends Fragment {
     private static final String TAG = "ChatActivityFragment";
     EditText edtMessage;
     String userName = "user1";
+
     public ChatActivityFragment() {
     }
 
@@ -66,6 +69,26 @@ public class ChatActivityFragment extends Fragment {
             }
         });
 
+        Button sendConnectErrorBtn = (Button) v.findViewById(R.id.btnConnectError);
+        sendConnectErrorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Send Connect Error...", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                sendConnectErrorMessage("93");
+            }
+        });
+
+        Button RandomBtn = (Button) v.findViewById(R.id.btnRandom);
+        RandomBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Send Random Student ID...", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                sendRandomID();
+            }
+        });
+
         edtMessage = (EditText) v.findViewById(R.id.edtMessage);
 
         loadUserNameFromPreferences();
@@ -78,7 +101,7 @@ public class ChatActivityFragment extends Fragment {
         userName = prefs.getString(Constants.KEY_USER_NAME, "Name");
     }
 
-    private void joinChat(String userName){
+    private void joinChat(String userName) {
         Bundle data = new Bundle();
         data.putInt(ChatService.MSG_CMD, ChatService.CMD_JOIN_CHAT);
         data.putString(ChatService.KEY_USER_NAME, userName);
@@ -87,7 +110,7 @@ public class ChatActivityFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-    private void leaveChat(){
+    private void leaveChat() {
         Bundle data = new Bundle();
         data.putInt(ChatService.MSG_CMD, ChatService.CMD_LEAVE_CHAT);
         Intent intent = new Intent(getContext(), ChatService.class);
@@ -95,7 +118,7 @@ public class ChatActivityFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-    private void sendMessage(String messageText){
+    private void sendMessage(String messageText) {
         Bundle data = new Bundle();
         data.putInt(ChatService.MSG_CMD, ChatService.CMD_SEND_MESSAGE);
         data.putString(ChatService.KEY_MESSAGE_TEXT, messageText);
@@ -104,12 +127,32 @@ public class ChatActivityFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-    private void simulateOnMessage(){
+    private void simulateOnMessage() {
         Bundle data = new Bundle();
         data.putInt(ChatService.MSG_CMD, ChatService.CMD_RECEIVE_MESSAGE);
         Intent intent = new Intent(getContext(), ChatService.class);
         intent.putExtras(data);
         getActivity().startService(intent);
     }
+
+    private void sendConnectErrorMessage(String studentId) {
+        Bundle data = new Bundle();
+        data.putInt(ChatService.MSG_CMD, ChatService.CMD_CONNECT_ERROR_MESSAGE);
+        Intent intent = new Intent(getContext(), ChatService.class);
+        data.putString(ChatService.STUDENT_ID, studentId);
+        intent.putExtras(data);
+        getActivity().startService(intent);
+    }
+
+    private void sendRandomID() {
+        Bundle data = new Bundle();
+        data.putInt(ChatService.MSG_CMD, ChatService.CMD_SEND_RANDOM_ID);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        data.putString(ChatService.STUDENT_ID, timestamp.toString());
+        Intent intent = new Intent(getContext(), ChatService.class);
+        intent.putExtras(data);
+        getActivity().startService(intent);
+    }
+
 
 }

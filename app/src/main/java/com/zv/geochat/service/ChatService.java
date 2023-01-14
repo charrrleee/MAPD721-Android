@@ -17,9 +17,12 @@ public class ChatService extends Service {
     public static final String MSG_CMD = "msg_cmd";
     public static final int CMD_JOIN_CHAT = 10;
     public static final int CMD_LEAVE_CHAT = 20;
+    public static final int CMD_CONNECT_ERROR_MESSAGE = 25;
     public static final int CMD_SEND_MESSAGE = 30;
+    public static final int CMD_SEND_RANDOM_ID = 35;
     public static final int CMD_RECEIVE_MESSAGE = 40;
     public static final String KEY_MESSAGE_TEXT = "message_text";
+    public static final String STUDENT_ID = "student_id";
     public static final String KEY_USER_NAME = "user_name";
 
     private NotificationManager notificationMgr;
@@ -89,13 +92,19 @@ public class ChatService extends Service {
         } else if (command == CMD_LEAVE_CHAT) {
             notificationDecorator.displaySimpleNotification("Leaving Chat...", "Disconnecting");
             stopSelf();
+        } else if (command == CMD_CONNECT_ERROR_MESSAGE) {
+            String studentId = (String) data.get(STUDENT_ID);
+            notificationDecorator.displaySimpleNotification("Send Connect Error...", "Student Connect Error: " + studentId);
         } else if (command == CMD_SEND_MESSAGE) {
             String messageText = (String) data.get(KEY_MESSAGE_TEXT);
             notificationDecorator.displaySimpleNotification("Sending message...", messageText);
+        } else if (command == CMD_SEND_RANDOM_ID) {
+            String studentId = (String) data.get(STUDENT_ID);
+            notificationDecorator.displaySimpleNotification("ChatService Received: " + studentId, "Student ID Received: " + studentId);
         } else if (command == CMD_RECEIVE_MESSAGE) {
             String testUser = "User2";
             String testMessage = "Simulated Message";
-            notificationDecorator.displaySimpleNotification("New message...: "+ testUser, testMessage);
+            notificationDecorator.displaySimpleNotification("New message...: " + testUser, testMessage);
         } else {
             Log.w(TAG, "Ignoring Unknown Command! id=" + command);
         }
